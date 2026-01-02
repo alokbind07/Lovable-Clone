@@ -37,7 +37,10 @@ public class ProjectController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponse> updateProject(@PathVariable Long id, @RequestBody ProjectRequest request){
+    public ResponseEntity<ProjectResponse> updateProject(
+            @PathVariable Long id,
+            @RequestBody ProjectRequest request
+    ){
         long userId = 1L;
         return ResponseEntity.ok(projectService.updateProject(id, request, userId));
     }
