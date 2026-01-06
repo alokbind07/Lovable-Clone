@@ -5,6 +5,7 @@ import com.alokbind.projects.lovable_clone.dto.project.ProjectResponse;
 import com.alokbind.projects.lovable_clone.dto.project.ProjectSummaryResponse;
 import com.alokbind.projects.lovable_clone.entity.Project;
 import com.alokbind.projects.lovable_clone.entity.User;
+import com.alokbind.projects.lovable_clone.error.ResourceNotFoundException;
 import com.alokbind.projects.lovable_clone.mapper.ProjectMapper;
 import com.alokbind.projects.lovable_clone.repository.ProjectRepository;
 import com.alokbind.projects.lovable_clone.repository.UserRepository;
@@ -90,6 +91,7 @@ public class ProjectServiceImpl implements ProjectService {
     //INTERNAL FUNCTIONS
 
     public Project getAccessibleProjectById(Long projectId, Long userId){
-        return projectRepository.findAccessibleProjectById(projectId, userId).orElseThrow();
+        return projectRepository.findAccessibleProjectById(projectId, userId)
+                .orElseThrow(() -> new ResourceNotFoundException(("Project"), projectId.toString()));
     }
 }
