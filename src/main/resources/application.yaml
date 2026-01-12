@@ -18,4 +18,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 jwt:
-  secret-key: ajj$%^56g54VGVhh%$6FGh45&*67f554&^%554(*&(*gfg454545)f546&^%
+  secret-key: ${SECRET_KEY}
+
+stripe:
+  secret: ${STRIPE_SECRET_KEY}
