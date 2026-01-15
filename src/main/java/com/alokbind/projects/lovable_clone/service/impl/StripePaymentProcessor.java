@@ -4,23 +4,31 @@ import com.alokbind.projects.lovable_clone.dto.subscription.CheckoutRequest;
 import com.alokbind.projects.lovable_clone.dto.subscription.CheckoutResponse;
 import com.alokbind.projects.lovable_clone.dto.subscription.PortalResponse;
 import com.alokbind.projects.lovable_clone.entity.Plan;
+import com.alokbind.projects.lovable_clone.entity.User;
 import com.alokbind.projects.lovable_clone.error.ResourceNotFoundException;
 import com.alokbind.projects.lovable_clone.repository.PlanRepository;
+import com.alokbind.projects.lovable_clone.repository.UserRepository;
 import com.alokbind.projects.lovable_clone.security.AuthUtil;
 import com.alokbind.projects.lovable_clone.service.PaymentProcessor;
 import com.stripe.exception.StripeException;
+import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StripePaymentProcessor implements PaymentProcessor {
 
     private final AuthUtil authUtil;
     private final PlanRepository planRepository;
+    private final UserRepository userRepository;
 
     @Value("${client.url}")
     private String frontendUrl;
@@ -31,8 +39,10 @@ public class StripePaymentProcessor implements PaymentProcessor {
                 new ResourceNotFoundException("Plan", request.planId().toString()));
 
         Long userId = authUtil.getCurrentUserId();
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new ResourceNotFoundException("user", userId.toString()));
 
-        SessionCreateParams params = SessionCreateParams.builder()
+        var params = SessionCreateParams.builder()
                 .addLineItem(
                         SessionCreateParams.LineItem.builder().setPrice(plan.getStripePriceId()).setQuantity(1L).build())
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
@@ -46,11 +56,16 @@ public class StripePaymentProcessor implements PaymentProcessor {
                 .setSuccessUrl(frontendUrl + "/success.html?session_id={CHECKOUT_SESSION_ID}")
                 .setCancelUrl(frontendUrl + "/cancel.html")
                 .putMetadata("user_id", userId.toString())
-                .putMetadata("plan_id", plan.getId().toString())
-                .build();
+                .putMetadata("plan_id", plan.getId().toString());
 
         try {
-            Session session = Session.create(params);
+            String stripeCustomerId = user.getStripeCustomerId();
+            if(stripeCustomerId == null || stripeCustomerId.isEmpty()){
+                params.setCustomerEmail(user.getUsername());
+            }else{
+                params.setCustomer(stripeCustomerId);
+            }
+            Session session = Session.create(params.build());
             return new CheckoutResponse(session.getUrl());
         } catch (StripeException e) {
             throw new RuntimeException(e);
@@ -60,5 +75,10 @@ public class StripePaymentProcessor implements PaymentProcessor {
     @Override
     public PortalResponse openCustomerPortal(Long userId) {
         return null;
+    }
+
+    @Override
+    public void handleWebhookEvent(String type, StripeObject stripeObject, Map<String, String> metadata) {
+        log.info("type");
     }
 }
