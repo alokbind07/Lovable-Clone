@@ -8,6 +8,7 @@ import com.alokbind.projects.lovable_clone.entity.ProjectMember;
 import com.alokbind.projects.lovable_clone.entity.ProjectMemberId;
 import com.alokbind.projects.lovable_clone.entity.User;
 import com.alokbind.projects.lovable_clone.enums.ProjectRole;
+import com.alokbind.projects.lovable_clone.error.BadRequestException;
 import com.alokbind.projects.lovable_clone.error.ResourceNotFoundException;
 import com.alokbind.projects.lovable_clone.mapper.ProjectMapper;
 import com.alokbind.projects.lovable_clone.repository.ProjectMemberRepository;
@@ -15,6 +16,7 @@ import com.alokbind.projects.lovable_clone.repository.ProjectRepository;
 import com.alokbind.projects.lovable_clone.repository.UserRepository;
 import com.alokbind.projects.lovable_clone.security.AuthUtil;
 import com.alokbind.projects.lovable_clone.service.ProjectService;
+import com.alokbind.projects.lovable_clone.service.SubscriptionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +38,15 @@ public class ProjectServiceImpl implements ProjectService {
     ProjectMapper projectMapper;
     ProjectMemberRepository projectMemberRepository;
     AuthUtil authUtil;
+    SubscriptionService subscriptionService;
 
     @Override
     public ProjectResponse createProject(ProjectRequest request) {
+
+        if(!subscriptionService.canCreateNewProject()){
+            throw new BadRequestException("User cannot create a new project with current plan, Upgrade plan now.");
+        }
+
         Long userId = authUtil.getCurrentUserId();
 //        User owner = userRepository.findById(userId).orElseThrow(
 //                () -> new ResourceNotFoundException("User", userId.toString())
