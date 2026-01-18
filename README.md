@@ -91,6 +91,56 @@ The database schema is designed to support collaborative AI-driven application d
 
 This schema ensures strong data consistency between conversational context, generated artifacts, billing constraints, and runtime execution.
 
+## Features
+
+### AI-Driven Application Generation
+- Generate complete React applications from natural-language prompts.
+- Supports iterative refinement through conversational context.
+- Streams AI-generated code in real time using Server-Sent Events (SSE).
+
+### Subscription-Based Access Control
+- Feature access is governed by active subscription plans.
+- Different plans define limits on:
+  - Number of projects
+  - Daily AI token usage
+  - Concurrent previews
+- Subscription state is continuously synchronized with Stripe via webhooks.
+
+### Secure Stripe Payments
+- Integrated Stripe Checkout for secure, PCI-compliant payments.
+- Supports subscription lifecycle events including activation, renewal, and cancellation.
+- Webhook-driven updates ensure billing and access consistency.
+
+### Usage Monitoring & Quota Enforcement
+- Tracks AI token usage, request latency, and actions per user.
+- Enforces plan-based limits in real time to prevent overuse.
+- Usage logs enable transparency and future billing analytics.
+
+### Project & Workspace Management
+- Create and manage multiple projects per user.
+- Ownership and collaboration support with role-based access (Editor, Viewer).
+- Project visibility can be controlled via public/private settings.
+
+### Retrieval-Augmented Generation (RAG)
+- Existing project files are embedded and stored in a vector database.
+- Relevant code context is retrieved during generation to improve accuracy and consistency.
+- Reduces hallucinations and maintains architectural coherence.
+
+### Real-Time Preview & Execution
+- Each project is executed in an isolated Kubernetes namespace.
+- Secure micro-VM–based execution ensures strong isolation.
+- Users receive a live preview URL for instant feedback.
+
+### Persistent Storage & Versioning
+- Generated files are stored in object storage (MinIO).
+- Enables durable project state and fast preview reloads.
+- Metadata and relationships are managed via a relational database.
+
+### Scalable & Production-Ready Architecture
+- Microservices-based backend with centralized API Gateway.
+- Horizontally scalable services designed for high concurrency.
+- Stateless execution with durable storage for reliability.
+
 ## Subscription & Payment System
 
 Lovable Clone implements a subscription-based payment model using **Stripe**, enabling secure billing, plan management, and usage-based access control.
