@@ -91,5 +91,49 @@ The database schema is designed to support collaborative AI-driven application d
 
 This schema ensures strong data consistency between conversational context, generated artifacts, billing constraints, and runtime execution.
 
+## Subscription & Payment System
+
+Lovable Clone implements a subscription-based payment model using **Stripe**, enabling secure billing, plan management, and usage-based access control.
+
+The integration follows Stripe’s recommended best practices for SaaS applications and supports scalable subscription lifecycle management.
+
+### Key Capabilities
+
+- **Subscription Plans**
+  - Multiple plans are supported with configurable limits (projects, tokens, previews).
+  - Each plan is mapped to a Stripe Price ID for billing synchronization.
+
+- **Secure Checkout**
+  - Users are redirected to Stripe Checkout for secure payment processing.
+  - Sensitive card data is handled entirely by Stripe, ensuring PCI compliance.
+
+- **Subscription Lifecycle Management**
+  - Active, canceled, and expired subscriptions are tracked in the system.
+  - Billing periods, renewal status, and cancellation-at-period-end are persisted.
+
+- **Webhook-Based Synchronization**
+  - Stripe webhooks are used to listen for subscription events such as:
+    - `checkout.session.completed`
+    - `customer.subscription.updated`
+    - `customer.subscription.deleted`
+  - Webhooks ensure reliable state synchronization between Stripe and the application database.
+
+- **Usage Enforcement**
+  - User entitlements are enforced based on the active subscription plan.
+  - Token usage and API consumption are monitored and logged for quota control.
+
+### Data Flow
+
+1. User selects a subscription plan.
+2. Backend creates a Stripe Checkout Session.
+3. User completes payment on Stripe-hosted checkout.
+4. Stripe sends webhook events to update subscription state.
+5. Application updates user access and usage limits accordingly.
+
+> Stripe integration is implemented using the official Stripe APIs and follows the guidelines described in the Stripe documentation: https://docs.stripe.com/
+
+> Payment workflows are designed to be idempotent and webhook-driven to ensure consistency under retries and network failures.
+
+
 
 
