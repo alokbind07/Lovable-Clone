@@ -57,3 +57,39 @@ The system converts natural-language prompts into fully functional React applica
 - **Strong isolation** using per-project execution environments
 - **Improved generation accuracy** through RAG-based context injection
 
+## Database Design (ER Diagram)
+
+![Lovable Clone ER Diagram]
+
+<img width="5804" height="2820" alt="ER_Diagram" src="https://github.com/user-attachments/assets/1c660784-57f8-4675-8e85-99e76d0175b6" />
+
+> Entity-relationship model supporting users, projects, AI conversations, subscriptions, and execution lifecycle.
+
+### Schema Overview
+
+The database schema is designed to support collaborative AI-driven application development, subscription-based access control, and execution tracking at scale.
+
+### Core Domains
+
+#### User & Access Management
+- **User**: Represents a platform user with authentication and profile metadata.
+- **Subscription / Plan**: Manages billing, usage limits, and feature entitlements via Stripe.
+- **Usage_Log**: Tracks token usage, latency, and actions for monitoring and quota enforcement.
+
+#### Project & Collaboration
+- **Project**: Logical container for a generated application.
+- **Project_Ownership**: Defines project ownership semantics.
+- **Project_Member**: Enables multi-user collaboration with role-based access (EDITOR, VIEWER).
+- **Project_File**: Stores generated source file metadata, with content persisted in object storage.
+
+#### AI Conversation Layer
+- **Chat_Session**: Groups AI interactions per project.
+- **Chat_Message**: Stores prompts, responses, tool calls, and token usage for conversational continuity.
+
+#### Execution & Preview
+- **Preview**: Tracks live execution instances, Kubernetes namespaces, and preview URLs.
+
+This schema ensures strong data consistency between conversational context, generated artifacts, billing constraints, and runtime execution.
+
+
+
