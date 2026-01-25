@@ -4,9 +4,9 @@ spring:
     description : this is a lovable clone application
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/lovable
+    url: jdbc:postgresql://localhost:9010/pgvector-test
     username: postgres
-    password: 1234
+    password: postgres1607
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -27,7 +27,6 @@ spring:
           model: meta-llama/llama-3.1-8b-instruct
           temperature: 0.0
 
-
 jwt:
   secret-key: ${SECRET_KEY}
 
@@ -43,3 +42,9 @@ logging:
   level:
     org.springframework.ai:
       chat.client: DEBUG
+
+minio:
+  url: http://localhost:9000
+  access-key: AlokMinio
+  secret-key: AlokMinio1607
+  project-bucket: projects
