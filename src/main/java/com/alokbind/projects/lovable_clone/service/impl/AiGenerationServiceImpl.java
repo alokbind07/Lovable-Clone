@@ -1,6 +1,7 @@
 package com.alokbind.projects.lovable_clone.service.impl;
 
 import com.alokbind.projects.lovable_clone.llm.PromptUtils;
+import com.alokbind.projects.lovable_clone.llm.advisors.FileTreeContextAdvisor;
 import com.alokbind.projects.lovable_clone.security.AuthUtil;
 import com.alokbind.projects.lovable_clone.service.AiGenerationService;
 import com.alokbind.projects.lovable_clone.service.ProjectFileService;
@@ -25,6 +26,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
     private final ChatClient chatClient;
     private final AuthUtil authUtil;
     private final ProjectFileService projectFileService;
+    private final FileTreeContextAdvisor fileTreeContextAdvisor;
 
     private static final Pattern FILE_TAG_PATTERN = Pattern.compile("<file path=\"([^\"]+)\">(.*?)</file>", Pattern.DOTALL);
 
@@ -46,6 +48,7 @@ public class AiGenerationServiceImpl implements AiGenerationService {
                 .user(userMessage)
                 .advisors(advisorSpec -> {
                             advisorSpec.params(advisorParams);
+                            advisorSpec.advisors(fileTreeContextAdvisor);
                         }
                 )
                 .stream()
