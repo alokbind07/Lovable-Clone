@@ -184,6 +184,160 @@ The integration follows Stripe’s recommended best practices for SaaS applicati
 
 > Payment workflows are designed to be idempotent and webhook-driven to ensure consistency under retries and network failures.
 
+## AI Code Generation System Architecture & Spring AI Integration
+
+This section documents the enterprise-grade architecture and integration approach used for the AI-driven code generation system in the Lovable Clone project. The design focuses on scalability, observability, resilience, and clear separation of responsibilities across system layers.
+
+---
+
+## System Architecture Diagram
+
+![AI Code Generation System Architecture]<img width="3701" height="2265" alt="ai_design_architecture" src="https://github.com/user-attachments/assets/9c6dd5b1-bc45-4552-be44-e076287bb304" />
+
+## Architectural Overview
+
+The AI Code Generation System is composed of the following logical components:
+
+1. Client Interface (Frontend)
+2. Backend Orchestration Service (Spring Boot)
+3. AI Execution Layer (Spring AI + OpenRouter)
+4. Context and Storage Layer (MinIO + Database)
+5. Tooling and Reliability Layer (File Tools, Circuit Breakers, Streaming Pipeline)
+
+The system is designed to provide context-aware AI-assisted development workflows by dynamically injecting repository structure and file content into model prompts.
+
+---
+
+## Step-by-Step Architecture Flow
+
+### 1. User Interaction and Prompt Submission
+
+The process begins in the frontend client where the user submits a natural language request, such as code generation, refactoring, or repository analysis. The request is transmitted to the backend via an HTTP POST request.
+
+The frontend also supports streaming responses, enabling real-time rendering of AI-generated output.
+
+---
+
+### 2. Backend Prompt Orchestration (Spring Boot)
+
+The Spring Boot service acts as the orchestration layer. It performs the following responsibilities:
+
+* Accepts the user prompt.
+* Applies system-level guardrails, constraints, and coding standards.
+* Constructs a composite prompt consisting of system prompts, user input, repository metadata, and file contents.
+* Initiates streaming communication with the AI model.
+
+This layer also buffers streaming chunks and tracks token usage and metadata for observability and billing.
+
+---
+
+### 3. Repository Context Ingestion (File Tree and Content Resolution)
+
+To enable context-aware code generation, the backend retrieves:
+
+* Repository file tree structure.
+* Selected file contents based on relevance.
+
+File content is retrieved using a dedicated tool interface that accepts file path lists and returns structured content. A circuit breaker mechanism protects the system from large or failing repository fetch operations.
+
+The effective model input context is constructed as:
+System Prompt + User Prompt + File Tree + File Content
+
+---
+
+### 4. AI Model Invocation via Spring AI and OpenRouter
+
+Spring AI is used as the abstraction layer for interacting with large language models. OpenRouter acts as the model gateway, enabling dynamic selection of models based on performance and cost requirements.
+
+Spring AI handles:
+
+* Model configuration and lifecycle
+* Prompt execution
+* Streaming token-level responses
+* Error handling and retries
+
+Reference for model catalog:
+[https://openrouter.ai/models](https://openrouter.ai/models)
+
+---
+
+### 5. Object Storage and Template Management (MinIO)
+
+MinIO is used as S3-compatible object storage for:
+
+* Code templates
+* Repository snapshots
+* Generated code artifacts
+* Intermediate AI outputs
+
+This separation ensures that large file artifacts are not stored directly in the relational database, improving scalability and performance.
+
+Reference for MinIO:
+[https://www.min.io/](https://www.min.io/)
+
+---
+
+### 6. System Prompt Governance
+
+System prompts define global AI behavior, coding rules, output formats, and safety constraints. These prompts are centrally managed and version-controlled to ensure consistent AI behavior across environments.
+
+Reference system prompt repository:
+[https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools](https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools)
+
+---
+
+### 7. Streaming Response Pipeline
+
+The backend streams AI responses to the frontend in real time. The streaming pipeline includes:
+
+* Chunk buffering for partial responses
+* Parsing of structured AI output
+* Token usage and latency monitoring
+
+This approach provides immediate feedback to developers and supports interactive AI-driven development workflows.
+
+---
+
+### 8. Reliability, Resilience, and Observability
+
+The system incorporates enterprise reliability patterns, including:
+
+* Circuit breakers for file retrieval and tool execution
+* Separation of metadata and binary storage
+* Centralized logging of AI prompts and responses
+* Usage metrics and monitoring for AI operations
+
+These mechanisms ensure system stability under high load and during partial failures.
+
+---
+
+## Spring AI Integration Strategy
+
+Spring AI serves as the core integration framework for AI capabilities within the Spring Boot ecosystem. It provides a consistent API for interacting with external AI providers and supports enterprise deployment requirements.
+
+Key responsibilities of Spring AI in this architecture include:
+
+* Unified AI provider configuration
+* Prompt orchestration and execution
+* Streaming AI responses
+* Integration with Spring Boot security, configuration, and observability stacks
+
+---
+
+## Enterprise Design Considerations
+
+The architecture is designed with the following enterprise principles:
+
+* Modularity and separation of concerns
+* Vendor-agnostic AI provider integration
+* Scalable object storage for large artifacts
+* Real-time streaming for developer experience
+* Governance of system prompts and AI behavior
+* Resilience patterns for external tool dependencies
+
+---
+
+This architecture enables a production-ready AI code generation platform suitable for internal developer platforms, enterprise copilots, and AI-assisted software engineering systems.
 
 
 
