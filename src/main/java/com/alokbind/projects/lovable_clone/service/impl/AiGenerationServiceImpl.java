@@ -2,6 +2,7 @@ package com.alokbind.projects.lovable_clone.service.impl;
 
 import com.alokbind.projects.lovable_clone.llm.PromptUtils;
 import com.alokbind.projects.lovable_clone.llm.advisors.FileTreeContextAdvisor;
+import com.alokbind.projects.lovable_clone.llm.tools.CodeGenerationTools;
 import com.alokbind.projects.lovable_clone.security.AuthUtil;
 import com.alokbind.projects.lovable_clone.service.AiGenerationService;
 import com.alokbind.projects.lovable_clone.service.ProjectFileService;
@@ -43,9 +44,12 @@ public class AiGenerationServiceImpl implements AiGenerationService {
 
         StringBuilder fullResponseBuffer = new StringBuilder();
 
+        CodeGenerationTools codeGenerationTools = new CodeGenerationTools(projectFileService, projectId);
+
         return chatClient.prompt()
                 .system(PromptUtils.CODE_GENERATION_SYSTEM_PROMPT)
                 .user(userMessage)
+                .tools(codeGenerationTools)
                 .advisors(advisorSpec -> {
                             advisorSpec.params(advisorParams);
                             advisorSpec.advisors(fileTreeContextAdvisor);
