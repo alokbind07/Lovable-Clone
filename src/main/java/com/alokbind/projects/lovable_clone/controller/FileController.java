@@ -2,6 +2,7 @@ package com.alokbind.projects.lovable_clone.controller;
 
 import com.alokbind.projects.lovable_clone.dto.project.FileContentResponse;
 import com.alokbind.projects.lovable_clone.dto.project.FileNode;
+import com.alokbind.projects.lovable_clone.dto.project.FileTreeResponse;
 import com.alokbind.projects.lovable_clone.service.ProjectFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +18,14 @@ public class FileController {
     private final ProjectFileService projectFileService;
 
     @GetMapping
-    public ResponseEntity<List<FileNode>> getFileTree(@PathVariable Long projectId){
+    public ResponseEntity<FileTreeResponse> getFileTree(@PathVariable Long projectId){
         return ResponseEntity.ok(projectFileService.getFileTree(projectId));
     }
 
-    @GetMapping("/{*path}")
+    @GetMapping("/content")
     public ResponseEntity<FileContentResponse> getFile(
             @PathVariable Long projectId,
-            @PathVariable String path
-    ){
+            @RequestParam String path) {
         return ResponseEntity.ok(projectFileService.getFileContent(projectId, path));
     }
 

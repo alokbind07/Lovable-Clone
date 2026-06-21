@@ -10,7 +10,7 @@ public interface ProjectService {
 
     List<ProjectSummaryResponse> getUserProjects();
 
-    ProjectResponse getUserProjectById(Long id);
+    ProjectSummaryResponse getUserProjectById(Long id);
 
     ProjectResponse createProject(ProjectRequest request);
 

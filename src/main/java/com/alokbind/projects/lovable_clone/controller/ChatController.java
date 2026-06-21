@@ -2,6 +2,7 @@ package com.alokbind.projects.lovable_clone.controller;
 
 import com.alokbind.projects.lovable_clone.dto.chat.ChatRequest;
 import com.alokbind.projects.lovable_clone.dto.chat.ChatResponse;
+import com.alokbind.projects.lovable_clone.dto.chat.StreamResponse;
 import com.alokbind.projects.lovable_clone.service.AiGenerationService;
 import com.alokbind.projects.lovable_clone.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +16,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/chat")
 public class ChatController {
 
     private final AiGenerationService aiGenerationService;
     private final ChatService chatService;
 
-    @PostMapping(value = "/api/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> streamChat(@RequestBody ChatRequest request){
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ServerSentEvent<StreamResponse>> streamChat(@RequestBody ChatRequest request){
 
         return aiGenerationService.streamResponse(request.message(), request.projectId())
-                .map(data -> ServerSentEvent.<String>builder()
+                .map(data -> ServerSentEvent.<StreamResponse>builder()
                         .data(data)
                         .build());
     }
